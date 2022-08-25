@@ -4,6 +4,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:notes_app/Constants/constants.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
 import 'package:provider/provider.dart';
@@ -19,42 +20,6 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final FocusNode _contentNode = FocusNode();
-  List<Color> _colors = [
-    Colors.grey.shade800,
-    Colors.grey,
-    Colors.redAccent,
-    Colors.red,
-    Colors.deepOrange,
-    Colors.deepOrangeAccent,
-    Colors.orange,
-    Colors.orangeAccent,
-    Colors.amber,
-    Colors.amberAccent,
-    Colors.yellowAccent,
-    Colors.yellow,
-    Colors.lime,
-    Colors.limeAccent,
-    Colors.greenAccent,
-    Colors.green,
-    Colors.lightGreenAccent,
-    Colors.blue,
-    Colors.blueAccent,
-    Colors.lightBlue,
-    Colors.lightBlueAccent,
-    Colors.deepPurple,
-    Colors.purple,
-    Colors.purpleAccent,
-    Colors.deepPurpleAccent,
-    Colors.indigo,
-    Colors.indigoAccent,
-    Colors.brown,
-    Colors.cyan,
-    Colors.cyanAccent,
-    Colors.pink,
-    Colors.pinkAccent,
-    Colors.teal,
-    Colors.tealAccent,
-  ];
   Color? _selectedColor;
   File? _noteImage;
 
@@ -64,7 +29,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
 
   @override
   void initState() {
-    _selectedColor = _colors.first;
+    _selectedColor = AppConstants.colors.first;
     super.initState();
   }
 
@@ -203,50 +168,54 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                         strokeWidth: 3,
                         radius: Radius.circular(25),
                         dashPattern: [10, 5],
-                        child: Stack(
-                          children: [
-                            Center(
-                              child: Container(
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  image: _noteImage != null
-                                      ? DecorationImage(
-                                          image: FileImage(_noteImage!),
-                                          fit: BoxFit.cover)
-                                      : null,
-                                ),
-                                child: _noteImage != null
-                                    ? null
-                                    : GestureDetector(
-                                        behavior: HitTestBehavior.opaque,
-                                        onTap: () {
-                                          _selectSourceSheet();
-                                        },
-                                        child: Icon(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            _selectSourceSheet();
+                          },
+                          child: Stack(
+                            children: [
+                              Center(
+                                child: Container(
+                                  clipBehavior: Clip.antiAlias,
+                                  decoration: BoxDecoration(
+                                    image: _noteImage != null
+                                        ? DecorationImage(
+                                            image: FileImage(_noteImage!),
+                                            fit: BoxFit.cover)
+                                        : null,
+                                  ),
+                                  child: _noteImage != null
+                                      ? null
+                                      : Icon(
                                           Ionicons.add_circle_outline,
                                           color: Theme.of(context).primaryColor,
                                           size: 40,
                                         ),
-                                      ),
+                                ),
                               ),
-                            ),
-                            if (_noteImage != null)
-                              Positioned.directional(
-                                  top: 10,
-                                  end: 10,
+                              if (_noteImage != null)
+                                Positioned.directional(
+                                  top: 5,
+                                  end: 5,
                                   textDirection: Directionality.of(context),
-                                  child: IconButton(
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder(),
+                                    ),
                                     onPressed: () {
                                       setState(() {
                                         _noteImage = null;
                                       });
                                     },
-                                    icon: Icon(
+                                    child: Icon(
                                       Ionicons.close,
                                       color: Colors.white,
                                     ),
-                                  )),
-                          ],
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                       ),
                     )
@@ -256,122 +225,118 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Wrap(
-                    children: [
-                      AnimatedContainer(
-                        height: _contentNode.hasPrimaryFocus ? 60 : 0,
-                        curve: Curves.easeInOut,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            border: Border(
-                                top: BorderSide(
-                                    width: 0.5, color: Colors.white24))),
-                        duration: const Duration(milliseconds: 300),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isBold = !isBold;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isBold
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : Colors.transparent,
-                                ),
-                                child: Icon(Icons.format_bold_rounded),
-                              ),
+                  AnimatedContainer(
+                    height: _contentNode.hasPrimaryFocus ? 60 : 0,
+                    curve: Curves.easeInOut,
+                    decoration: BoxDecoration(
+                        color: Theme.of(context).scaffoldBackgroundColor,
+                        border: Border(
+                            top:
+                                BorderSide(width: 0.5, color: Colors.white24))),
+                    duration: const Duration(milliseconds: 300),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isBold = !isBold;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isBold
+                                  ? Colors.grey.withOpacity(0.5)
+                                  : Colors.transparent,
                             ),
-                            //textAlign
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  isItalic = !isItalic;
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: isItalic
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : Colors.transparent,
-                                ),
-                                child: Icon(Icons.format_italic_outlined),
-                              ),
-                            ),
-
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  textAlign = 'left';
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: textAlign == 'left'
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : Colors.transparent,
-                                ),
-                                child: Icon(Icons.format_align_left),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  textAlign = 'center';
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: textAlign == 'center'
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : Colors.transparent,
-                                ),
-                                child: Icon(Icons.format_align_center),
-                              ),
-                            ),
-
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  textAlign = 'right';
-                                });
-                              },
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut,
-                                padding: const EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: textAlign == 'right'
-                                      ? Colors.grey.withOpacity(0.5)
-                                      : Colors.transparent,
-                                ),
-                                child: Icon(Icons.format_align_right),
-                              ),
-                            ),
-                          ],
+                            child: Icon(Icons.format_bold_rounded),
+                          ),
                         ),
-                      ),
-                    ],
+                        //textAlign
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isItalic = !isItalic;
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: isItalic
+                                  ? Colors.grey.withOpacity(0.5)
+                                  : Colors.transparent,
+                            ),
+                            child: Icon(Icons.format_italic_outlined),
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              textAlign = 'left';
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: textAlign == 'left'
+                                  ? Colors.grey.withOpacity(0.5)
+                                  : Colors.transparent,
+                            ),
+                            child: Icon(Icons.format_align_left),
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              textAlign = 'center';
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: textAlign == 'center'
+                                  ? Colors.grey.withOpacity(0.5)
+                                  : Colors.transparent,
+                            ),
+                            child: Icon(Icons.format_align_center),
+                          ),
+                        ),
+
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              textAlign = 'right';
+                            });
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: textAlign == 'right'
+                                  ? Colors.grey.withOpacity(0.5)
+                                  : Colors.transparent,
+                            ),
+                            child: Icon(Icons.format_align_right),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   Container(
                     height: 60,
@@ -384,13 +349,9 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                       padding: const EdgeInsets.all(10.0),
                       child: Row(
                         children: [
-                          Container(
-                            width: 25,
-                            height: 25,
-                            decoration: BoxDecoration(
-                              color: _selectedColor,
-                              shape: BoxShape.circle,
-                            ),
+                          CircleAvatar(
+                            radius: 13,
+                            backgroundColor: _selectedColor,
                           ),
                           const VerticalDivider(
                             thickness: 1,
@@ -398,19 +359,45 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                           Expanded(
                             child: ListView.separated(
                               scrollDirection: Axis.horizontal,
-                              itemCount: _colors.length,
+                              itemCount: AppConstants.colors.length,
                               itemBuilder: (context, index) => GestureDetector(
                                 onTap: () {
                                   setState(() {
-                                    _selectedColor = _colors[index];
+                                    _selectedColor = AppConstants.colors[index];
                                   });
                                 },
-                                child: Container(
-                                  width: 25,
-                                  height: 25,
-                                  decoration: BoxDecoration(
-                                      color: _colors[index],
-                                      shape: BoxShape.circle),
+                                child: CircleAvatar(
+                                  radius: _selectedColor ==
+                                          AppConstants.colors[index]
+                                      ? 18
+                                      : 13,
+                                  backgroundColor: AppConstants.colors[index]
+                                      .withOpacity(0.4),
+                                  child: CircleAvatar(
+                                    radius: 13,
+                                    backgroundColor: AppConstants.colors[index],
+                                    child: Center(
+                                      child: AnimatedScale(
+                                        scale: _selectedColor ==
+                                                AppConstants.colors[index]
+                                            ? 1
+                                            : 0,
+                                        duration: const Duration(
+                                          milliseconds: 300,
+                                        ),
+                                        curve: Curves.easeInOut,
+                                        child: Icon(
+                                          Ionicons.checkmark,
+                                          color: AppConstants.blackColorList
+                                                  .contains(AppConstants
+                                                      .colors[index])
+                                              ? Colors.black
+                                              : Colors.white,
+                                          size: 18,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ),
                               ),
                               separatorBuilder: (context, index) =>

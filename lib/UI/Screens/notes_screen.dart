@@ -19,6 +19,8 @@ class NotesScreen extends StatefulWidget {
 class _NotesScreenState extends State<NotesScreen> {
   int _currentIndex = 0;
   bool _showSearch = false;
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
   @override
   void initState() {
     WidgetsBinding.instance?.addPostFrameCallback((_) async {
@@ -29,56 +31,133 @@ class _NotesScreenState extends State<NotesScreen> {
     super.initState();
   }
 
+  //double containerRadius = 15;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final NotesViewModel _vm =
         Provider.of<NotesViewModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        title: !_showSearch
-            ? Text(
-                'Notes App',
-              )
-            : TextField(
+        // title: !_showSearch
+        //     ? Text(
+        //         'Notes App',
+        //       )
+        //     : TextField(
+        //         decoration: InputDecoration(
+        //           border: InputBorder.none,
+        //           hintText: 'Search',
+        //         ),
+        //       ),
+        // flexibleSpace: FlexibleSpaceBar(
+        //   background: AnimatedSlide(
+        //     offset: !_showSearch ? Offset(-2, 0) : Offset.zero,
+        //     duration: const Duration(milliseconds: 400),
+        //     child: SafeArea(
+        //       child: AnimatedContainer(
+        //         decoration: BoxDecoration(
+        //           color: AppConstants.appPrimaryColor,
+        //           borderRadius: BorderRadiusDirectional.only(
+        //               topEnd: Radius.circular(containerRadius),
+        //               bottomEnd: Radius.circular(containerRadius)),
+        //         ),
+        //         duration: const Duration(milliseconds: 400),
+        //       ),
+        //     ),
+        //     onEnd: () {
+        //       setState(() {
+        //         containerRadius = 0;
+        //       });
+        //     },
+        //   ),
+        // ),
+        title: Stack(alignment: Alignment.centerLeft, children: [
+          AnimatedOpacity(
+            opacity: _showSearch ? 0 : 1,
+            duration: const Duration(milliseconds: 400),
+            child: Text(
+              'Notes App',
+            ),
+          ),
+          AnimatedOpacity(
+            opacity: !_showSearch ? 0 : 1,
+            duration: const Duration(milliseconds: 400),
+            child: AnimatedSlide(
+              offset: !_showSearch ? Offset(-1, 0) : Offset.zero,
+              duration: const Duration(milliseconds: 400),
+              child: TextField(
+                controller: _searchController,
+                focusNode: _searchFocus,
                 decoration: InputDecoration(
                   border: InputBorder.none,
                   hintText: 'Search',
                 ),
               ),
+            ),
+          ),
+        ]),
         actions: [
-          if (!_showSearch)
-            IconButton(
-              onPressed: () async {
-                await _vm.deleteAll();
-              },
-              icon: Icon(
-                Ionicons.trash_bin,
-                color: Colors.red,
+          AnimatedOpacity(
+            opacity: _showSearch ? 0 : 1,
+            duration: const Duration(milliseconds: 400),
+            child: IgnorePointer(
+              ignoring: _showSearch,
+              child: IconButton(
+                onPressed: () async {
+                  await _vm.deleteAll();
+                },
+                icon: Icon(
+                  Ionicons.trash_bin,
+                  color: Colors.red,
+                ),
               ),
             ),
-          if (!_showSearch)
-            IconButton(
-                onPressed: () {
-                  // setState(() {
-                  //   _showSearch = !_showSearch;
-                  // });
-                  _showSearch = true;
-                  ModalRoute<Object?>? route = ModalRoute.of<Object?>(context);
-                  route
-                    ?..addLocalHistoryEntry(
-                        LocalHistoryEntry(onRemove: () => _showSearch = false))
-                    ..createAnimationController()
-                    ..createAnimation();
-                  route?.buildTransitions(
-                      context,
-                      route.animation!,
-                      route.animation!,
-                      FadeTransition(
-                        opacity: route.animation!,
-                        child: widget,
-                      ));
-                },
-                icon: Icon(Ionicons.search)),
+          ),
+          AnimatedOpacity(
+            opacity: _showSearch ? 0 : 1,
+            duration: const Duration(milliseconds: 400),
+            child: IgnorePointer(
+              ignoring: _showSearch,
+              child: IconButton(
+                  onPressed: () {
+                    // setState(() {
+                    //   _showSearch = !_showSearch;
+                    // });
+                    if (_showSearch) return;
+                    setState(() {
+                      _showSearch = true;
+                      FocusScope.of(context).requestFocus(_searchFocus);
+                    });
+                    //containerRadius = 15;
+                    ModalRoute<Object?>? route =
+                        ModalRoute.of<Object?>(context);
+                    route
+                      ?..addLocalHistoryEntry(LocalHistoryEntry(onRemove: () {
+                        _showSearch = false;
+                        //containerRadius = 15;
+                        FocusScope.of(context).unfocus();
+                        _searchController.clear();
+                      }))
+                      ..createAnimationController()
+                      ..createAnimation();
+                    route?.buildTransitions(
+                        context,
+                        route.animation!,
+                        route.animation!,
+                        FadeTransition(
+                          opacity: route.animation!,
+                          child: widget,
+                        ));
+                  },
+                  icon: Icon(Ionicons.search)),
+            ),
+          ),
         ],
       ),
       body: Consumer<NotesViewModel>(

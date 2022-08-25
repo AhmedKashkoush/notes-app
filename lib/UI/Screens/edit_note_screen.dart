@@ -1,9 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:notes_app/Constants/constants.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
 import 'package:provider/provider.dart';
@@ -19,54 +22,22 @@ class EditNoteScreen extends StatefulWidget {
 class _EditNoteScreenState extends State<EditNoteScreen> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
-  List<Color> _colors = [
-    Colors.grey.shade800,
-    Colors.grey,
-    Colors.redAccent,
-    Colors.red,
-    Colors.deepOrange,
-    Colors.deepOrangeAccent,
-    Colors.orange,
-    Colors.orangeAccent,
-    Colors.amber,
-    Colors.amberAccent,
-    Colors.yellowAccent,
-    Colors.yellow,
-    Colors.lime,
-    Colors.limeAccent,
-    Colors.greenAccent,
-    Colors.green,
-    Colors.lightGreenAccent,
-    Colors.blue,
-    Colors.blueAccent,
-    Colors.lightBlue,
-    Colors.lightBlueAccent,
-    Colors.deepPurple,
-    Colors.purple,
-    Colors.purpleAccent,
-    Colors.deepPurpleAccent,
-    Colors.indigo,
-    Colors.indigoAccent,
-    Colors.brown,
-    Colors.cyan,
-    Colors.cyanAccent,
-    Colors.pink,
-    Colors.pinkAccent,
-    Colors.teal,
-    Colors.tealAccent,
-  ];
   Color? _firstColor;
   Color? _selectedColor;
   File? _noteImage;
+  Uint8List? _bytes;
 
   @override
   void initState() {
     NoteModel model = widget.model;
     int colorCode = int.parse(model.color);
-    _firstColor = _colors.where((element) => colorCode == element.value).first;
+    _firstColor = AppConstants.colors
+        .where((element) => colorCode == element.value)
+        .first;
     _selectedColor = _firstColor;
     _titleController = TextEditingController(text: model.title);
     _contentController = TextEditingController(text: model.content);
+    if (widget.model.image != '') _bytes = base64Decode(widget.model.image);
     super.initState();
   }
 
@@ -130,7 +101,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Hero(
-                            tag: '${widget.model.id}/${widget.model.title}',
+                            tag:
+                                'Title tag:${widget.model.id}/${widget.model.title}',
                             child: Material(
                               color: Colors.transparent,
                               child: TextField(
@@ -150,7 +122,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                             ),
                           ),
                           Hero(
-                            tag: '${widget.model.id}/${widget.model.content}',
+                            tag:
+                                'Content tag:${widget.model.id}/${widget.model.content}',
                             child: Material(
                               color: Colors.transparent,
                               child: TextField(
@@ -180,7 +153,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                   height: 20,
                 ),
                 Text(
-                  'Add an image to your note',
+                  'Edit the note image',
                   style: Theme.of(context).textTheme.bodyText1,
                   textAlign: TextAlign.center,
                 ),
@@ -194,50 +167,65 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                     strokeWidth: 3,
                     radius: Radius.circular(25),
                     dashPattern: [10, 5],
-                    child: Stack(
-                      children: [
-                        Center(
-                          child: Container(
-                            clipBehavior: Clip.antiAlias,
-                            decoration: BoxDecoration(
-                              image: _noteImage != null
-                                  ? DecorationImage(
-                                      image: FileImage(_noteImage!),
-                                      fit: BoxFit.cover)
-                                  : null,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        _selectSourceSheet();
+                      },
+                      child: Stack(
+                        children: [
+                          Center(
+                            child: Hero(
+                              tag:
+                                  'Image tag:${widget.model.id}/${widget.model.image}',
+                              child: Container(
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  image: _noteImage != null
+                                      ? DecorationImage(
+                                          image: FileImage(_noteImage!),
+                                          fit: BoxFit.cover,
+                                        )
+                                      : _bytes != null
+                                          ? DecorationImage(
+                                              image: MemoryImage(_bytes!),
+                                              fit: BoxFit.cover,
+                                            )
+                                          : null,
+                                ),
+                                child: _noteImage != null || _bytes != null
+                                    ? null
+                                    : Icon(
+                                        Ionicons.add_circle_outline,
+                                        color: Theme.of(context).primaryColor,
+                                        size: 40,
+                                      ),
+                              ),
                             ),
-                            child: _noteImage != null
-                                ? null
-                                : GestureDetector(
-                                    behavior: HitTestBehavior.opaque,
-                                    onTap: () {
-                                      _selectSourceSheet();
-                                    },
-                                    child: Icon(
-                                      Ionicons.add_circle_outline,
-                                      color: Theme.of(context).primaryColor,
-                                      size: 40,
-                                    ),
-                                  ),
                           ),
-                        ),
-                        if (_noteImage != null)
-                          Positioned.directional(
-                              top: 10,
-                              end: 10,
+                          if (_noteImage != null || _bytes != null)
+                            Positioned.directional(
+                              top: 5,
+                              end: 5,
                               textDirection: Directionality.of(context),
-                              child: IconButton(
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  shape: CircleBorder(),
+                                ),
                                 onPressed: () {
                                   setState(() {
                                     _noteImage = null;
+                                    _bytes = null;
                                   });
                                 },
-                                icon: Icon(
+                                child: Icon(
                                   Ionicons.close,
                                   color: Colors.white,
                                 ),
-                              )),
-                      ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 )
@@ -253,13 +241,9 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
               padding: const EdgeInsets.all(10.0),
               child: Row(
                 children: [
-                  Container(
-                    width: 25,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: _selectedColor,
-                      shape: BoxShape.circle,
-                    ),
+                  CircleAvatar(
+                    radius: 13,
+                    backgroundColor: _selectedColor,
                   ),
                   const VerticalDivider(
                     thickness: 1,
@@ -267,18 +251,43 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                   Expanded(
                     child: ListView.separated(
                       scrollDirection: Axis.horizontal,
-                      itemCount: _colors.length,
+                      itemCount: AppConstants.colors.length,
                       itemBuilder: (context, index) => GestureDetector(
                         onTap: () {
                           setState(() {
-                            _selectedColor = _colors[index];
+                            _selectedColor = AppConstants.colors[index];
                           });
                         },
-                        child: Container(
-                          width: 25,
-                          height: 25,
-                          decoration: BoxDecoration(
-                              color: _colors[index], shape: BoxShape.circle),
+                        child: CircleAvatar(
+                          radius: _selectedColor == AppConstants.colors[index]
+                              ? 18
+                              : 13,
+                          backgroundColor:
+                              AppConstants.colors[index].withOpacity(0.4),
+                          child: CircleAvatar(
+                            radius: 13,
+                            backgroundColor: AppConstants.colors[index],
+                            child: Center(
+                              child: AnimatedScale(
+                                scale:
+                                    _selectedColor == AppConstants.colors[index]
+                                        ? 1
+                                        : 0,
+                                duration: const Duration(
+                                  milliseconds: 300,
+                                ),
+                                curve: Curves.easeInOut,
+                                child: Icon(
+                                  Ionicons.checkmark,
+                                  color: AppConstants.blackColorList
+                                          .contains(AppConstants.colors[index])
+                                      ? Colors.black
+                                      : Colors.white,
+                                  size: 18,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       ),
                       separatorBuilder: (context, index) => const SizedBox(
