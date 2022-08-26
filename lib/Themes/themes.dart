@@ -1,28 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:notes_app/Constants/constants.dart';
+import 'package:notes_app/Constants/app_colors.dart';
 
 class AppThemes {
   static ThemeMode themeMode = ThemeMode.system;
   static final ThemeData lightTheme = ThemeData(
-    primaryColor: AppConstants.appPrimaryColor,
+    primaryColor: AppColors.appPrimaryColor,
     primarySwatch: Colors.teal,
     appBarTheme: const AppBarTheme(
-        backgroundColor: AppConstants.appBgColor,
-        foregroundColor: AppConstants.appPrimaryColor,
+        backgroundColor: AppColors.appBgColor,
+        foregroundColor: AppColors.appPrimaryColor,
         elevation: 0),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppConstants.appBgColor,
-      selectedItemColor: AppConstants.appPrimaryColor,
+      backgroundColor: AppColors.appBgColor,
+      selectedItemColor: AppColors.appPrimaryColor,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppConstants.appPrimaryColor,
-      foregroundColor: AppConstants.appBgColor,
+      backgroundColor: AppColors.appPrimaryColor,
+      foregroundColor: AppColors.appBgColor,
     ),
-    scaffoldBackgroundColor: AppConstants.appBgColor,
-    cardTheme: const CardTheme(color: AppConstants.appBgColor),
+    scaffoldBackgroundColor: AppColors.appBgColor,
+    cardTheme: const CardTheme(color: AppColors.appBgColor),
     textTheme: const TextTheme(
-        bodyText1: TextStyle(
-            color: Colors.grey, fontSize: 20, fontWeight: FontWeight.w700)),
+      bodyText1: TextStyle(
+        color: Colors.grey,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+      ),
+      bodyText2: TextStyle(
+        color: Colors.grey,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
     brightness: Brightness.light,
     highlightColor: Colors.transparent,
     splashFactory: InkRipple.splashFactory,
@@ -34,30 +43,39 @@ class AppThemes {
   );
 
   static final ThemeData darkTheme = ThemeData(
-    primaryColor: AppConstants.appPrimaryColor,
+    primaryColor: AppColors.appPrimaryColor,
     primarySwatch: Colors.teal,
     appBarTheme: const AppBarTheme(
-        backgroundColor: AppConstants.appBgDarkColor,
-        foregroundColor: AppConstants.appPrimaryColor,
+        backgroundColor: AppColors.appBgDarkColor,
+        foregroundColor: AppColors.appPrimaryColor,
         elevation: 0),
     bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: AppConstants.appBgDarkColor,
-      selectedItemColor: AppConstants.appPrimaryColor,
+      backgroundColor: AppColors.appBgDarkColor,
+      selectedItemColor: AppColors.appPrimaryColor,
     ),
     floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppConstants.appBgDarkColor,
-      foregroundColor: AppConstants.appPrimaryColor,
+      backgroundColor: AppColors.appBgDarkColor,
+      foregroundColor: AppColors.appPrimaryColor,
     ),
-    scaffoldBackgroundColor: AppConstants.appBgDarkColorAlt,
-    cardTheme: const CardTheme(color: AppConstants.appBgDarkColor),
+    scaffoldBackgroundColor: AppColors.appBgDarkColorAlt,
+    cardTheme: const CardTheme(color: AppColors.appBgDarkColor),
     textTheme: const TextTheme(
-        bodyText1: TextStyle(
-            color: Colors.grey, fontSize: 20, fontWeight: FontWeight.w700)),
+      bodyText1: TextStyle(
+        color: Colors.grey,
+        fontSize: 20,
+        fontWeight: FontWeight.w700,
+      ),
+      bodyText2: TextStyle(
+        color: Colors.grey,
+        fontSize: 16,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
     brightness: Brightness.dark,
     highlightColor: Colors.transparent,
     splashFactory: InkRipple.splashFactory,
     colorScheme: ColorScheme.fromSwatch(
-      primaryColorDark: AppConstants.appPrimaryColor,
+      primaryColorDark: AppColors.appPrimaryColor,
       primarySwatch: Colors.teal,
       accentColor: Colors.teal,
       brightness: Brightness.dark,

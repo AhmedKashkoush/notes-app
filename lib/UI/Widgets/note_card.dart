@@ -3,9 +3,10 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:notes_app/Constants/constants.dart';
+import 'package:notes_app/Constants/app_colors.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/UI/Screens/edit_note_screen.dart';
+import 'package:notes_app/UI/Widgets/like_button.dart';
 
 class NoteCard extends StatefulWidget {
   final NoteModel model;
@@ -28,13 +29,11 @@ class _NoteCardState extends State<NoteCard> {
     _isFav = widget.model.isFav;
     _bytes = base64Decode(widget.model.image);
     int colorCode = int.parse(widget.model.color);
-    Color color = AppConstants.colors
-        .where((element) => colorCode == element.value)
-        .first;
-    _titleColor = AppConstants.blackColorList.contains(color)
-        ? Colors.black
-        : Colors.white;
-    _contentColor = AppConstants.blackColorList.contains(color)
+    Color color =
+        AppColors.colors.where((element) => colorCode == element.value).first;
+    _titleColor =
+        AppColors.blackColorList.contains(color) ? Colors.black : Colors.white;
+    _contentColor = AppColors.blackColorList.contains(color)
         ? Colors.black54
         : Colors.white54;
     super.initState();
@@ -117,37 +116,11 @@ class _NoteCardState extends State<NoteCard> {
                 ),
                 Row(
                   children: [
-                    StatefulBuilder(builder: (context, setState) {
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _isFav = !_isFav;
-                            widget.onFavTapped.call();
-                          });
-                        },
-                        child: AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          transitionBuilder: (child, animation) =>
-                              ScaleTransition(
-                            scale: animation,
-                            child: child,
-                          ),
-                          switchInCurve: Curves.bounceInOut,
-                          switchOutCurve: Curves.bounceInOut,
-                          child: _isFav
-                              ? Icon(
-                                  Ionicons.heart,
-                                  key: ValueKey<bool>(_isFav),
-                                  color: Colors.red,
-                                )
-                              : Icon(
-                                  Ionicons.heart_outline,
-                                  key: ValueKey<bool>(_isFav),
-                                  color: _titleColor,
-                                ),
-                        ),
-                      );
-                    }),
+                    LikeButton(
+                      isLiked: _isFav,
+                      onTap: widget.onFavTapped,
+                      outlineColor: _titleColor,
+                    ),
                     Expanded(
                       child: Text(
                         '${date}',

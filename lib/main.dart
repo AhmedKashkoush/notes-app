@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:notes_app/Constants/constants.dart';
+import 'package:notes_app/Constants/app_colors.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
 import 'package:notes_app/Themes/themes.dart';
-import 'package:notes_app/UI/Screens/notes_screen.dart';
+import 'package:notes_app/UI/Screens/home_screen.dart';
 import 'package:notes_app/Utils/Helpers/db_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     SystemUiOverlayStyle style = SystemUiOverlayStyle(
         statusBarColor:
-            isDark ? AppConstants.appBgDarkColor : AppConstants.appBgColor);
+            isDark ? AppColors.appBgDarkColor : AppColors.appBgColor);
     SystemChrome.setSystemUIOverlayStyle(style);
     return MultiProvider(
       providers: [
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         theme: AppThemes.lightTheme,
         darkTheme: AppThemes.darkTheme,
         themeMode: AppThemes.themeMode,
-        home: const NotesScreen(),
+        home: const HomeScreen(),
       ),
     );
   }

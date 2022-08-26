@@ -1,0 +1,32 @@
+        // title: !_showSearch
+        //     ? Text(
+        //         'Notes App',
+        //       )
+        //     : TextField(
+        //         decoration: InputDecoration(
+        //           border: InputBorder.none,
+        //           hintText: 'Search',
+        //         ),
+        //       ),
+        // flexibleSpace: FlexibleSpaceBar(
+        //   background: AnimatedSlide(
+        //     offset: !_showSearch ? Offset(-2, 0) : Offset.zero,
+        //     duration: const Duration(milliseconds: 400),
+        //     child: SafeArea(
+        //       child: AnimatedContainer(
+        //         decoration: BoxDecoration(
+        //           color: AppConstants.appPrimaryColor,
+        //           borderRadius: BorderRadiusDirectional.only(
+        //               topEnd: Radius.circular(containerRadius),
+        //               bottomEnd: Radius.circular(containerRadius)),
+        //         ),
+        //         duration: const Duration(milliseconds: 400),
+        //       ),
+        //     ),
+        //     onEnd: () {
+        //       setState(() {
+        //         containerRadius = 0;
+        //       });
+        //     },
+        //   ),
+        // ),

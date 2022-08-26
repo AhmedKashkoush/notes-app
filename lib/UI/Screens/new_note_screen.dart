@@ -4,9 +4,11 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:notes_app/Constants/constants.dart';
+import 'package:notes_app/Constants/app_colors.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
+import 'package:notes_app/UI/Widgets/note_text_field.dart';
+import 'package:notes_app/UI/Widgets/stacked_clear_button.dart';
 import 'package:provider/provider.dart';
 
 class NewNoteScreen extends StatefulWidget {
@@ -29,7 +31,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
 
   @override
   void initState() {
-    _selectedColor = AppConstants.colors.first;
+    _selectedColor = AppColors.colors.first;
     super.initState();
   }
 
@@ -83,7 +85,8 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
             children: [
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.only(
+                      top: 18, left: 18, right: 18, bottom: 80),
                   children: [
                     Card(
                       elevation: 4,
@@ -92,24 +95,19 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            TextField(
+                            NoteTextField(
+                              hint: 'Type your title',
                               controller: _titleController,
+                              fontWeight: FontWeight.bold,
                               onChanged: (s) {
                                 setState(() {});
                               },
                               onTap: () {
                                 setState(() {});
                               },
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.bold, fontSize: 20),
-                              decoration: InputDecoration(
-                                  hintText: 'Type your title',
-                                  hintStyle: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20),
-                                  border: InputBorder.none),
                             ),
-                            TextField(
+                            NoteTextField(
+                              hint: "What this note's about?",
                               controller: _contentController,
                               focusNode: _contentNode,
                               maxLines: 20,
@@ -119,32 +117,17 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                               onTap: () {
                                 setState(() {});
                               },
+                              fontWeight:
+                                  isBold ? FontWeight.w600 : FontWeight.w300,
+                              fontSize: 16,
                               textAlign: textAlign == 'right'
                                   ? TextAlign.end
                                   : textAlign == 'center'
                                       ? TextAlign.center
                                       : TextAlign.start,
-                              style: TextStyle(
-                                fontWeight:
-                                    isBold ? FontWeight.w600 : FontWeight.w300,
-                                fontSize: 16,
-                                fontStyle: isItalic
-                                    ? FontStyle.italic
-                                    : FontStyle.normal,
-                              ),
-                              decoration: InputDecoration(
-                                hintText: "What this note's about?",
-                                hintStyle: TextStyle(
-                                  fontWeight: isBold
-                                      ? FontWeight.w600
-                                      : FontWeight.w300,
-                                  fontSize: 16,
-                                  fontStyle: isItalic
-                                      ? FontStyle.italic
-                                      : FontStyle.normal,
-                                ),
-                                border: InputBorder.none,
-                              ),
+                              fontStyle: isItalic
+                                  ? FontStyle.italic
+                                  : FontStyle.normal,
                             ),
                           ],
                         ),
@@ -195,24 +178,12 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                                 ),
                               ),
                               if (_noteImage != null)
-                                Positioned.directional(
-                                  top: 5,
-                                  end: 5,
-                                  textDirection: Directionality.of(context),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      shape: CircleBorder(),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _noteImage = null;
-                                      });
-                                    },
-                                    child: Icon(
-                                      Ionicons.close,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                                StackedClearButton(
+                                  onClear: () {
+                                    setState(() {
+                                      _noteImage = null;
+                                    });
+                                  },
                                 ),
                             ],
                           ),
@@ -222,197 +193,188 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                   ],
                 ),
               ),
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AnimatedContainer(
-                    height: _contentNode.hasPrimaryFocus ? 60 : 0,
-                    curve: Curves.easeInOut,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border(
-                            top:
-                                BorderSide(width: 0.5, color: Colors.white24))),
-                    duration: const Duration(milliseconds: 300),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isBold = !isBold;
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isBold
-                                  ? Colors.grey.withOpacity(0.5)
-                                  : Colors.transparent,
-                            ),
-                            child: Icon(Icons.format_bold_rounded),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                height: _contentNode.hasPrimaryFocus ? 60 : 0,
+                curve: Curves.easeInOut,
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: Theme.of(context).scaffoldBackgroundColor,
+                      border: Border(
+                          top: BorderSide(width: 0.5, color: Colors.white24))),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isBold = !isBold;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isBold
+                                ? Colors.grey.withOpacity(0.5)
+                                : Colors.transparent,
                           ),
+                          child: Icon(Icons.format_bold_rounded),
                         ),
-                        //textAlign
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              isItalic = !isItalic;
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: isItalic
-                                  ? Colors.grey.withOpacity(0.5)
-                                  : Colors.transparent,
-                            ),
-                            child: Icon(Icons.format_italic_outlined),
+                      ),
+                      //textAlign
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            isItalic = !isItalic;
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isItalic
+                                ? Colors.grey.withOpacity(0.5)
+                                : Colors.transparent,
                           ),
+                          child: Icon(Icons.format_italic_outlined),
                         ),
+                      ),
 
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              textAlign = 'left';
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: textAlign == 'left'
-                                  ? Colors.grey.withOpacity(0.5)
-                                  : Colors.transparent,
-                            ),
-                            child: Icon(Icons.format_align_left),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            textAlign = 'left';
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: textAlign == 'left'
+                                ? Colors.grey.withOpacity(0.5)
+                                : Colors.transparent,
                           ),
+                          child: Icon(Icons.format_align_left),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              textAlign = 'center';
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: textAlign == 'center'
-                                  ? Colors.grey.withOpacity(0.5)
-                                  : Colors.transparent,
-                            ),
-                            child: Icon(Icons.format_align_center),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            textAlign = 'center';
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: textAlign == 'center'
+                                ? Colors.grey.withOpacity(0.5)
+                                : Colors.transparent,
                           ),
+                          child: Icon(Icons.format_align_center),
                         ),
+                      ),
 
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              textAlign = 'right';
-                            });
-                          },
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: textAlign == 'right'
-                                  ? Colors.grey.withOpacity(0.5)
-                                  : Colors.transparent,
-                            ),
-                            child: Icon(Icons.format_align_right),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            textAlign = 'right';
+                          });
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: textAlign == 'right'
+                                ? Colors.grey.withOpacity(0.5)
+                                : Colors.transparent,
                           ),
+                          child: Icon(Icons.format_align_right),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                  Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context).scaffoldBackgroundColor,
-                        border: Border(
-                            top:
-                                BorderSide(width: 0.5, color: Colors.white24))),
-                    child: Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Row(
-                        children: [
-                          CircleAvatar(
+                ),
+              ),
+            ],
+          ),
+          bottomNavigationBar: Container(
+            height: 60,
+            decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                border:
+                    Border(top: BorderSide(width: 0.5, color: Colors.white24))),
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 13,
+                    backgroundColor: _selectedColor,
+                  ),
+                  const VerticalDivider(
+                    thickness: 1,
+                  ),
+                  Expanded(
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: AppColors.colors.length,
+                      itemBuilder: (context, index) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = AppColors.colors[index];
+                          });
+                        },
+                        child: CircleAvatar(
+                          radius: _selectedColor == AppColors.colors[index]
+                              ? 18
+                              : 13,
+                          backgroundColor:
+                              AppColors.colors[index].withOpacity(0.4),
+                          child: CircleAvatar(
                             radius: 13,
-                            backgroundColor: _selectedColor,
-                          ),
-                          const VerticalDivider(
-                            thickness: 1,
-                          ),
-                          Expanded(
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: AppConstants.colors.length,
-                              itemBuilder: (context, index) => GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _selectedColor = AppConstants.colors[index];
-                                  });
-                                },
-                                child: CircleAvatar(
-                                  radius: _selectedColor ==
-                                          AppConstants.colors[index]
-                                      ? 18
-                                      : 13,
-                                  backgroundColor: AppConstants.colors[index]
-                                      .withOpacity(0.4),
-                                  child: CircleAvatar(
-                                    radius: 13,
-                                    backgroundColor: AppConstants.colors[index],
-                                    child: Center(
-                                      child: AnimatedScale(
-                                        scale: _selectedColor ==
-                                                AppConstants.colors[index]
-                                            ? 1
-                                            : 0,
-                                        duration: const Duration(
-                                          milliseconds: 300,
-                                        ),
-                                        curve: Curves.easeInOut,
-                                        child: Icon(
-                                          Ionicons.checkmark,
-                                          color: AppConstants.blackColorList
-                                                  .contains(AppConstants
-                                                      .colors[index])
-                                              ? Colors.black
-                                              : Colors.white,
-                                          size: 18,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                            backgroundColor: AppColors.colors[index],
+                            child: Center(
+                              child: AnimatedScale(
+                                scale: _selectedColor == AppColors.colors[index]
+                                    ? 1
+                                    : 0,
+                                duration: const Duration(
+                                  milliseconds: 300,
+                                ),
+                                curve: Curves.easeInOut,
+                                child: Icon(
+                                  Ionicons.checkmark,
+                                  color: AppColors.blackColorList
+                                          .contains(AppColors.colors[index])
+                                      ? Colors.black
+                                      : Colors.white,
+                                  size: 18,
                                 ),
                               ),
-                              separatorBuilder: (context, index) =>
-                                  const SizedBox(
-                                width: 20,
-                              ),
                             ),
                           ),
-                        ],
+                        ),
+                      ),
+                      separatorBuilder: (context, index) => const SizedBox(
+                        width: 20,
                       ),
                     ),
                   ),
                 ],
               ),
-            ],
+            ),
           ),
         ),
       ),
