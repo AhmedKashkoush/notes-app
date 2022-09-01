@@ -44,6 +44,8 @@ dependencies:
   dotted_border: ^2.0.0+2
   flutter_launcher_icons: ^0.9.3
   flutter_native_splash: ^2.1.6
+  flutter_staggered_animations: ^1.0.0
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

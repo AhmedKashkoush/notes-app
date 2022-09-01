@@ -4,11 +4,13 @@ import 'package:notes_app/Constants/app_colors.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
 import 'package:notes_app/Themes/themes.dart';
 import 'package:notes_app/UI/Screens/home_screen.dart';
+import 'package:notes_app/Utils/Helpers/cache_helper.dart';
 import 'package:notes_app/Utils/Helpers/db_helper.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefsApi.init();
   await DBHelper.db;
   runApp(const MyApp());
 }

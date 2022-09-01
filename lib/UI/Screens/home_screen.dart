@@ -6,6 +6,7 @@ import 'package:notes_app/UI/Screens/archived_notes_screen.dart';
 import 'package:notes_app/UI/Screens/favourite_notes_screen.dart';
 import 'package:notes_app/UI/Screens/new_note_screen.dart';
 import 'package:notes_app/UI/Screens/notes_screen.dart';
+import 'package:notes_app/Utils/Helpers/cache_helper.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = SharedPrefsApi.getInt('current page') ?? 0;
   bool _showSearch = false;
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
@@ -139,6 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            SharedPrefsApi.setInt('current page', _currentIndex);
           });
         },
         items: [

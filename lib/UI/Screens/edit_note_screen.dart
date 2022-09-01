@@ -292,7 +292,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             title: 'Delete note?',
             content: 'Are you sure you want to delete this note?',
             centerTitle: true,
-            image: AssetImage(AppImages.noNotesImg),
+            image: AssetImage(AppImages.deleteNoteImg),
             onCancel: () {
               Navigator.pop(context);
             },

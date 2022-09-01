@@ -52,6 +52,7 @@ class AppColors {
     Colors.lime,
     Colors.limeAccent,
     Colors.greenAccent,
+    Colors.lightGreenAccent,
     Colors.lightBlueAccent,
     Colors.cyan,
     Colors.cyanAccent,

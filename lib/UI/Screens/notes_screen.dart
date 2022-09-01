@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:notes_app/Constants/app_images.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/Logic/ViewModels/notes_view_model.dart';
@@ -38,22 +39,31 @@ class _NotesScreenState extends State<NotesScreen> {
         else if (provider.notes.isNotEmpty)
           return OrientationBuilder(builder: (context, orientation) {
             bool isPortrait = orientation == Orientation.portrait;
-            return StaggeredGridView.countBuilder(
-              padding: const EdgeInsets.all(16),
-              crossAxisCount: isPortrait ? 2 : 3,
-              itemBuilder: (BuildContext context, int index) => NoteCard(
-                  model: provider.notes[index],
-                  onFavTapped: () {
-                    NoteModel model = provider.notes[index];
-                    if (!model.isFav)
-                      provider.addToFavourites(model.id!);
-                    else
-                      provider.removeFromFavourites(model.id!);
-                  }),
-              itemCount: provider.notes.length,
-              staggeredTileBuilder: (int index) {
-                return StaggeredTile.fit(1);
-              },
+            return AnimationLimiter(
+              child: StaggeredGridView.countBuilder(
+                padding: const EdgeInsets.all(16),
+                crossAxisCount: isPortrait ? 2 : 3,
+                itemBuilder: (BuildContext context, int index) =>
+                    AnimationConfiguration.staggeredGrid(
+                  columnCount: isPortrait ? 2 : 3,
+                  position: index,
+                  child: FadeInAnimation(
+                    child: NoteCard(
+                        model: provider.notes[index],
+                        onFavTapped: () {
+                          NoteModel model = provider.notes[index];
+                          if (!model.isFav)
+                            provider.addToFavourites(model.id!);
+                          else
+                            provider.removeFromFavourites(model.id!);
+                        }),
+                  ),
+                ),
+                itemCount: provider.notes.length,
+                staggeredTileBuilder: (int index) {
+                  return StaggeredTile.fit(1);
+                },
+              ),
             );
           });
         else
