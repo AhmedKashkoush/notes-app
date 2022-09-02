@@ -17,7 +17,7 @@ class DBApi implements NotesRepository {
     int response =
         await DBHelper.create(query, [title, content, color, date, '', 0, 0]);
     if (response == 0) throw Exception();
-    return;
+    return response;
   }
 
   @override
@@ -34,7 +34,7 @@ class DBApi implements NotesRepository {
         "INSERT INTO notes('title','content','image','color','date','is_favourite','is_archived') VALUES(?,?,?,?,?,?,?)";
     int response = await DBHelper.create(
         query, [title, content, image, color, date, 0, 0]);
-    if (response != 0) {
+    if (response == 0) {
       //await FileHelper.deleteImage(bytes);
       throw Exception();
     }
@@ -79,6 +79,7 @@ class DBApi implements NotesRepository {
     if (response == 0) {
       throw Exception();
     }
+    return response;
   }
 
   @override
@@ -89,6 +90,7 @@ class DBApi implements NotesRepository {
     if (response == 0) {
       throw Exception();
     }
+    return response;
   }
 
   @override
@@ -108,13 +110,44 @@ class DBApi implements NotesRepository {
 
   @override
   Future readNotes() async {
-    String readQuery = "SELECT * FROM notes";
+    String readQuery = "SELECT * FROM notes WHERE is_archived = 0";
     List<Map<String, Object?>> data = await DBHelper.read(readQuery, []);
     return data;
   }
 
   @override
-  Future updateNote(NoteModel model) async {}
+  Future updateNote(NoteModel model) async {
+    //'title','content','color','date','image'
+    int id = model.id!;
+    String title = model.title;
+    String content = model.content;
+    String image = model.image;
+    String color = model.color;
+    String date = model.date;
+    String updateQuery =
+        "UPDATE notes SET title = ?,content = ?,image = ?,color = ?,date = ? WHERE id = ?";
+    int response = await DBHelper.update(
+        updateQuery, [title, content, image, color, date, id]);
+    return response;
+  }
+
+  @override
+  Future updateNoteWithImage(NoteModel model, File imageFile) async {
+    String? bytes =
+        await FileHelper.saveImage(imageFile, 'note-${model.id}-${model.date}');
+    if (bytes == null) throw Exception();
+    int id = model.id!;
+    String title = model.title;
+    String content = model.content;
+    String image = bytes;
+    String color = model.color;
+    String date = model.date;
+    String updateQuery =
+        "UPDATE notes SET title = ?,content = ?,image = ?,color = ?,date = ? WHERE id = ?";
+    int response = await DBHelper.update(
+        updateQuery, [title, content, image, color, date, id]);
+    return response;
+  }
 
   @override
   Future markDone(int id) async {
@@ -138,14 +171,14 @@ class DBApi implements NotesRepository {
 
   @override
   Future readArchive() async {
-    String readQuery = "SELECT * FROM notes WHRERE is_archived = 1";
+    String readQuery = "SELECT * FROM notes WHERE is_archived = 1";
     List<Map<String, Object?>> data = await DBHelper.read(readQuery, []);
     return data;
   }
 
   @override
   Future readFavourites() async {
-    String readQuery = "SELECT * FROM notes WHRERE is_favourite = 1";
+    String readQuery = "SELECT * FROM notes WHERE is_favourite = 1";
     List<Map<String, Object?>> data = await DBHelper.read(readQuery, []);
     return data;
   }

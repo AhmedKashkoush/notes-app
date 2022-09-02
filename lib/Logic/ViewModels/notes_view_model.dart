@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:notes_app/Data/LocalDB/db_api.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/Data/Repositories/notes_repository.dart';
+import 'package:notes_app/Utils/Helpers/file_helper.dart';
 
 class NotesViewModel extends ChangeNotifier implements NotesRepository {
   final DBApi _api = DBApi();
@@ -49,7 +50,7 @@ class NotesViewModel extends ChangeNotifier implements NotesRepository {
       int index = _notes.indexOf(model);
       _notes.removeAt(index);
       NoteModel newModel = NoteModel(
-        id: model.id,
+        id: id,
         title: model.title,
         content: model.content,
         color: model.color,
@@ -88,7 +89,17 @@ class NotesViewModel extends ChangeNotifier implements NotesRepository {
     try {
       response = await _api.createNoteWithImage(model, image);
       if (response != 0) {
-        _notes.add(model);
+        String? bytes =
+            await FileHelper.saveImage(image, 'note-${model.id}-${model.date}');
+        NoteModel newModel = NoteModel(
+          title: model.title,
+          content: model.content,
+          color: model.color,
+          date: model.date,
+          isFav: model.isFav,
+          image: bytes!,
+        );
+        _notes.add(newModel);
       }
     } catch (e) {}
     _isLoading = false;
@@ -97,14 +108,19 @@ class NotesViewModel extends ChangeNotifier implements NotesRepository {
   }
 
   @override
-  Future<void> deleteNote(int id) async {
+  Future deleteNote(int id) async {
+    int response = 0;
     _isLoading = true;
     notifyListeners();
     try {
-      await _api.deleteNote(id);
+      response = await _api.deleteNote(id);
+      if (response != 0) {
+        _notes.removeWhere((element) => element.id == id);
+      }
     } catch (e) {}
     _isLoading = false;
     notifyListeners();
+    return response;
   }
 
   @override
@@ -149,44 +165,6 @@ class NotesViewModel extends ChangeNotifier implements NotesRepository {
   }
 
   @override
-  Future<void> removeFromArchive(int id) async {}
-
-  @override
-  Future<void> removeFromFavourites(int id) async {
-    try {
-      await _api.removeFromFavourites(id);
-      NoteModel model = _notes.where((element) => element.id == id).first;
-      int index = _notes.indexOf(model);
-      _notes.removeAt(index);
-      NoteModel newModel = NoteModel(
-        id: model.id,
-        title: model.title,
-        content: model.content,
-        color: model.color,
-        date: model.date,
-        image: model.image,
-        isFav: false,
-      );
-      _notes.insert(index, newModel);
-      _favNotes.remove(model);
-    } catch (e) {}
-  }
-
-  @override
-  Future<void> unmarkDone(int id) async {
-    _isLoading = true;
-    notifyListeners();
-    try {
-      await _api.unmarkDone(id);
-    } catch (e) {}
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  @override
-  Future<void> updateNote(NoteModel model) async {}
-
-  @override
   Future readArchive() async {
     _isLoading = true;
     notifyListeners();
@@ -208,10 +186,98 @@ class NotesViewModel extends ChangeNotifier implements NotesRepository {
       List _notesData = await _api.readFavourites();
       List<NoteModel> _newNotes =
           _notesData.map((element) => NoteModel.fromJson(element)).toList();
+      _favNotes.clear();
       _favNotes.addAll(_newNotes);
     } catch (e) {}
     _isLoading = false;
     notifyListeners();
+  }
+
+  @override
+  Future<void> removeFromArchive(int id) async {}
+
+  @override
+  Future<void> removeFromFavourites(int id) async {
+    try {
+      await _api.removeFromFavourites(id);
+      NoteModel model = _notes.where((element) => element.id == id).first;
+      int index = _notes.indexOf(model);
+      _notes.removeAt(index);
+      NoteModel newModel = NoteModel(
+        id: model.id,
+        title: model.title,
+        content: model.content,
+        color: model.color,
+        date: model.date,
+        image: model.image,
+        isFav: false,
+      );
+      _notes.insert(index, newModel);
+      _favNotes.removeWhere(
+        (element) => element.id == id,
+      );
+    } catch (e) {}
+    notifyListeners();
+  }
+
+  @override
+  Future<void> unmarkDone(int id) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _api.unmarkDone(id);
+    } catch (e) {}
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  @override
+  Future updateNote(NoteModel model) async {
+    int response = 0;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      response = await _api.updateNote(model);
+      if (response != 0) {
+        NoteModel newModel =
+            _notes.where((element) => element.id == model.id).first;
+        int index = _notes.indexOf(newModel);
+        _notes[index] = model;
+      }
+    } catch (e) {}
+    _isLoading = false;
+    notifyListeners();
+    return response;
+  }
+
+  @override
+  Future updateNoteWithImage(NoteModel model, File image) async {
+    int response = 0;
+    _isLoading = true;
+    notifyListeners();
+    try {
+      response = await _api.updateNoteWithImage(model, image);
+      String? bytes =
+          await FileHelper.saveImage(image, 'note-${model.id}-${model.date}');
+      if (response != 0) {
+        NoteModel newModel =
+            _notes.where((element) => element.id == model.id).first;
+        int index = _notes.indexOf(newModel);
+        NoteModel modifiedModel = NoteModel(
+          id: newModel.id,
+          title: newModel.title,
+          content: newModel.content,
+          color: newModel.color,
+          date: newModel.date,
+          isFav: newModel.isFav,
+          image: bytes!,
+        );
+        _notes[index] = modifiedModel;
+      }
+    } catch (e) {}
+    _isLoading = false;
+    notifyListeners();
+    return response;
   }
 
   @override

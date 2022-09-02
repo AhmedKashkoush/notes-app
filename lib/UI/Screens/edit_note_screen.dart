@@ -26,6 +26,9 @@ class EditNoteScreen extends StatefulWidget {
 class _EditNoteScreenState extends State<EditNoteScreen> {
   late TextEditingController _titleController;
   late TextEditingController _contentController;
+  //late final NotesViewModel _vm;
+  late int _id;
+  String _image = '';
   Color? _firstColor;
   Color? _selectedColor;
   File? _noteImage;
@@ -34,6 +37,8 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   @override
   void initState() {
     NoteModel model = widget.model;
+    _id = model.id!;
+    _image = model.image;
     int colorCode = int.parse(model.color);
     _firstColor =
         AppColors.colors.where((element) => colorCode == element.value).first;
@@ -55,6 +60,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
   Widget build(BuildContext context) {
     final NotesViewModel _vm = Provider.of<NotesViewModel>(
       context,
+      listen: false,
     );
     return Scaffold(
       appBar: AppBar(
@@ -64,25 +70,29 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                         _titleController.text != widget.model.title) ||
                     (_contentController.text.isNotEmpty &&
                         _contentController.text != widget.model.content) ||
-                    (_selectedColor != _firstColor)
+                    (_selectedColor != _firstColor) ||
+                    (_image != widget.model.image || _noteImage != null)
                 ? () async {
-                    // NoteModel model = NoteModel(
-                    //   id: 0,
-                    //   title: _titleController.text,
-                    //   content: _contentController.text,
-                    //   color: '${_selectedColor!.value}',
-                    //   date: '${DateTime.now()}',
-                    // );
-                    // int response;
-                    // if (_noteImage == null)
-                    //   response = await _vm.createNote(model);
-                    // else
-                    //   response =
-                    //       await _vm.createNoteWithImage(model, _noteImage!);
-                    // if (response == 0) {
-                    //   await _vm.readNotes();
-                    //   Navigator.pop(context);
-                    // }
+                    String _image = _bytes != null ? base64Encode(_bytes!) : '';
+                    NoteModel model = NoteModel(
+                      id: widget.model.id,
+                      title: _titleController.text,
+                      content: _contentController.text,
+                      image: _image,
+                      color: '${_selectedColor!.value}',
+                      date: '${DateTime.now()}',
+                      isFav: widget.model.isFav,
+                    );
+                    int response;
+                    if (_noteImage == null)
+                      response = await _vm.updateNote(model);
+                    else
+                      response =
+                          await _vm.updateNoteWithImage(model, _noteImage!);
+                    if (response != 0) {
+                      //await _vm.readNotes();
+                      Navigator.pop(context);
+                    }
                   }
                 : null,
             child: const Text('Save'),
@@ -202,6 +212,7 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
                           setState(() {
                             _noteImage = null;
                             _bytes = null;
+                            _image = '';
                           });
                         },
                       ),
@@ -296,9 +307,25 @@ class _EditNoteScreenState extends State<EditNoteScreen> {
             onCancel: () {
               Navigator.pop(context);
             },
-            onConfirm: () {
+            onConfirm: () async {
+              final NotesViewModel _vm =
+                  Provider.of<NotesViewModel>(context, listen: false);
+              int response = await _vm.deleteNote(_id);
+              //await _vm.readNotes();
               Navigator.pop(context);
-              Navigator.pop(context);
+              if (response != 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: const Text('Note Deleted'),
+                    behavior: SnackBarBehavior.floating,
+                    margin: const EdgeInsets.all(14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                );
+                Navigator.pop(context);
+              }
             },
             hasSpaceBetweenActions: true,
           ));

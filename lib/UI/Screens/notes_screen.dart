@@ -41,12 +41,14 @@ class _NotesScreenState extends State<NotesScreen> {
             bool isPortrait = orientation == Orientation.portrait;
             return AnimationLimiter(
               child: StaggeredGridView.countBuilder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.only(
+                    top: 16, right: 16, left: 16, bottom: 80),
                 crossAxisCount: isPortrait ? 2 : 3,
                 itemBuilder: (BuildContext context, int index) =>
                     AnimationConfiguration.staggeredGrid(
                   columnCount: isPortrait ? 2 : 3,
                   position: index,
+                  duration: const Duration(milliseconds: 500),
                   child: FadeInAnimation(
                     child: NoteCard(
                         model: provider.notes[index],

@@ -6,6 +6,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:notes_app/Constants/app_colors.dart';
 import 'package:notes_app/Data/Models/note_model.dart';
 import 'package:notes_app/UI/Screens/edit_note_screen.dart';
+import 'package:notes_app/UI/Transitions/fade_page_transition.dart';
 import 'package:notes_app/UI/Widgets/like_button.dart';
 
 class NoteCard extends StatefulWidget {
@@ -47,10 +48,10 @@ class _NoteCardState extends State<NoteCard> {
     final DateTime date = DateTime.parse(dateString);
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => EditNoteScreen(
-                  model: widget.model,
-                )));
+        Navigator.of(context).push(FadePageTransition(
+            page: EditNoteScreen(
+          model: widget.model,
+        )));
       },
       child: Card(
         clipBehavior: Clip.antiAlias,
@@ -77,60 +78,73 @@ class _NoteCardState extends State<NoteCard> {
             ),
           Padding(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            child: Stack(
               children: [
-                Hero(
-                  tag: 'Title tag:${widget.model.id}/${widget.model.title}',
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Text(
-                      widget.model.title,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: _titleColor,
-                      ),
-                    ),
+                Positioned.directional(
+                  textDirection: Directionality.of(context),
+                  end: 0,
+                  child: Icon(
+                    Ionicons.archive_outline,
+                    color: _titleColor,
                   ),
                 ),
-                const SizedBox(
-                  height: 15,
-                ),
-                Hero(
-                  tag: 'Content tag:${widget.model.id}/${widget.model.content}',
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: Text(
-                      widget.model.content,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 16,
-                        color: _contentColor,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(
-                  height: 40,
-                ),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    LikeButton(
-                      isLiked: _isFav,
-                      onTap: widget.onFavTapped,
-                      outlineColor: _titleColor,
-                    ),
-                    Expanded(
-                      child: Text(
-                        '${date}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: _contentColor,
+                    Hero(
+                      tag: 'Title tag:${widget.model.id}/${widget.model.title}',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          widget.model.title,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: _titleColor,
+                          ),
                         ),
-                        textAlign: TextAlign.end,
                       ),
+                    ),
+                    const SizedBox(
+                      height: 15,
+                    ),
+                    Hero(
+                      tag:
+                          'Content tag:${widget.model.id}/${widget.model.content}',
+                      child: Material(
+                        type: MaterialType.transparency,
+                        child: Text(
+                          widget.model.content,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                            color: _contentColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 40,
+                    ),
+                    Row(
+                      children: [
+                        LikeButton(
+                          isLiked: _isFav,
+                          onTap: widget.onFavTapped,
+                          outlineColor: _titleColor,
+                        ),
+                        Expanded(
+                          child: Text(
+                            '${date}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontSize: 12,
+                              color: _contentColor,
+                            ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

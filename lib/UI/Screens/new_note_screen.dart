@@ -71,7 +71,7 @@ class _NewNoteScreenState extends State<NewNoteScreen> {
                         else
                           response =
                               await _vm.createNoteWithImage(model, _noteImage!);
-                        if (response == 0) {
+                        if (response != 0) {
                           await _vm.readNotes();
                           Navigator.pop(context);
                         }

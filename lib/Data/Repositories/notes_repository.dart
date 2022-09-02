@@ -8,6 +8,7 @@ abstract class NotesRepository {
   Future createNoteWithImage(NoteModel model, File image);
   Future readNotes();
   Future updateNote(NoteModel model);
+  Future updateNoteWithImage(NoteModel model, File image);
   Future deleteNote(int id);
   //Done
   Future markDone(int id);

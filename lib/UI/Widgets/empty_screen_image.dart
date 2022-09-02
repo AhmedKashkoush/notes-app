@@ -4,7 +4,9 @@ import 'package:notes_app/UI/Widgets/orientation_widget.dart';
 class EmptyScreenImage extends StatelessWidget {
   final String imageUrl;
   final String? text;
-  const EmptyScreenImage({Key? key, required this.imageUrl, this.text})
+  final double size;
+  const EmptyScreenImage(
+      {Key? key, required this.imageUrl, this.text, this.size = 250})
       : super(key: key);
 
   @override
